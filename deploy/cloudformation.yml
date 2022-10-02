@@ -28,7 +28,7 @@ Resources:
     Properties:
       FunctionName: !Join ['-', [!Ref AppName, 'lambda'] ]
       Runtime: nodejs16.x
-      Handler: !Join ['/', ["/opt/bin", 'newrelic-lambda-wrapper.handler'] ] 
+      Handler: "newrelic-lambda-wrapper.handler"
       Timeout: 30
       Role: !GetAtt 'LambdaRole.Arn'
       Code:
