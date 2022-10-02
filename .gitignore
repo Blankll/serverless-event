@@ -1,5 +1,7 @@
 dist
 node_modules
+artifacts
+
 .vscode
 .idea
-artifacts
+.DS_Store
