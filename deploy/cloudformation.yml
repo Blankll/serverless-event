@@ -4,7 +4,12 @@ Parameters:
     Description: lambda default name
     Type: String
     Default: serverless-event
-
+  NRAccountId:
+    Description: the newrelic account id
+    Type: String
+  NRLicenseKey:
+    Description: the newrelic account licence key
+    Type: String
 Resources:
   LambdaRole:
     Type: AWS::IAM::Role
@@ -23,11 +28,18 @@ Resources:
     Properties:
       FunctionName: !Join ['-', [!Ref AppName, 'lambda'] ]
       Runtime: nodejs16.x
-      Handler: src/index.handler
-      Timeout: 300
+      Handler: !Join ['/', ["/opt/bin", 'newrelic-lambda-wrapper.handler'] ] 
+      Timeout: 30
       Role: !GetAtt 'LambdaRole.Arn'
       Code:
         ZipFile: '../dist/'
+      Environment:
+        Variables:
+          NEW_RELIC_LAMBDA_HANDLER: src/index.handler
+          NEW_RELIC_ACCOUNT_ID: !Ref NRAccountId
+          NEW_RELIC_LICENSE_KEY: !Ref NRLicenseKey
+      Layers:
+        - !Sub arn:${AWS::Partition}:lambda:${AWS::Region}:451483290750:layer:NewRelicNodeJS16X:16
       Tags:
         - Key: application
           Value: !Ref AppName
