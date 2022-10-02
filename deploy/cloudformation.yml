@@ -14,6 +14,8 @@ Resources:
   LambdaRole:
     Type: AWS::IAM::Role
     Properties:
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
       AssumeRolePolicyDocument:
         Version: 2012-10-17
         Statement:
@@ -21,8 +23,29 @@ Resources:
             Principal:
               Service: lambda.amazonaws.com
             Action: sts:AssumeRole
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: lambda-access-dynamodb-policy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:GetItem
+                  - dynamodb:PartiQLSelect
+                Resource:
+                  - !GetAtt DynamoDB.Arn
+                  - !Join ['/', [!GetAtt DynamoDB.Arn, 'index', '*'] ]
+  DynamoDB:
+    Type: AWS::DynamoDB::Table
+    Properties: 
+      TableName: !Join ['-', [!Ref AppName, 'table'] ]
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions: 
+        - AttributeName: "id"
+          AttributeType: "S"
+      KeySchema: 
+        - AttributeName: "id"
+          KeyType: "HASH"
   LambdaFunction:
     Type: AWS::Lambda::Function
     Properties:
