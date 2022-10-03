@@ -31,7 +31,6 @@ Resources:
               - Effect: Allow
                 Action:
                   - dynamodb:GetItem
-                  - dynamodb:PartiQLSelect
                 Resource:
                   - !GetAtt DynamoDB.Arn
                   - !Join ['/', [!GetAtt DynamoDB.Arn, 'index', '*'] ]
