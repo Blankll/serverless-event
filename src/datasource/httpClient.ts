@@ -1,3 +1,5 @@
+import fetch from 'node-fetch';
+
 export interface HttpClient {
   get: (path: string) => Promise<{ status: number; message: string; body: string }>;
 }

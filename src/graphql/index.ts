@@ -30,41 +30,33 @@ type DataSources = {
   httpApi: HttpClient;
 };
 
-const dataSources = (): DataSources => ({
+const dataSources = () => ({
   dynamoDB: loadDynamoDBClient(),
   httpApi: loadHttpClient('https://www.google.com'),
 });
 
-const resolvers = {
+const resolvers: Resolvers<{ dataSources: DataSources }> = {
   Query: {
     hello: () => 'Hello world!',
-    dbCall: async (parent: any, input: any, { dataSources }: { dataSources: DataSources }) => {
+    dbCall: async (parent, input, { dataSources }) => {
       console.log({ parent, input }, 'input-dbCall');
       return JSON.stringify(await dataSources.dynamoDB.getItem(input.id));
     },
-    simulate: {
-      http: async (_: any, __: any, { dataSources }: { dataSources: DataSources }) =>
-        dataSources.httpApi.get(''),
-      dynamo: {
-        partiQL: async (
-          parent: any,
-          { id }: { id: string },
-          { dataSources }: { dataSources: DataSources }
-        ) => {
-          console.log({ parent, id }, 'input-obj');
-          return JSON.stringify(
-            await dataSources.dynamoDB.query(
-              `SELECT * FROM serverless-event-table WHERE id='${id}'`
-            )
-          );
-        },
-        getItem: async (
-          _: any,
-          { id }: { id: string },
-          { dataSources }: { dataSources: DataSources }
-        ) => JSON.stringify(await dataSources.dynamoDB.getItem(id)),
-      },
+    simulate: () => ({}),
+  },
+  Simulate: {
+    http: async (_, __, { dataSources }) => dataSources.httpApi.get(''),
+    dynamo: () => ({}),
+  },
+  Dynamo: {
+    partiQL: async (parent, { id }, { dataSources }) => {
+      console.log({ parent, id }, 'input-obj');
+      return JSON.stringify(
+        await dataSources.dynamoDB.query(`SELECT * FROM serverless-event-table WHERE id='${id}'`)
+      );
     },
+    getItem: async (_, { id }, { dataSources }) =>
+      JSON.stringify(await dataSources.dynamoDB.getItem(id)),
   },
 };
 
@@ -72,6 +64,6 @@ export const server = new ApolloServer({
   typeDefs,
   resolvers,
   dataSources: dataSources as any,
-  introspection: true,
   plugins: [ApolloServerPluginLandingPageGraphQLPlayground(), newRelicPlugin],
+  introspection: true,
 });
