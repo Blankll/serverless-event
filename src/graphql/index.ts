@@ -2,6 +2,7 @@ import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-co
 import { ApolloServer, gql } from 'apollo-server-lambda';
 import { DynamoDBClient, HttpClient, loadDynamoDBClient, loadHttpClient } from '../datasource';
 import newRelicPlugin from '@newrelic/apollo-server-plugin';
+import { Resolvers } from '../generated/resolverTypes';
 
 const typeDefs = gql`
   type Http {

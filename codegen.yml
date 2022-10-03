@@ -1,0 +1,15 @@
+overwrite: true
+schema: "src/**/*.ts"
+generates:
+  src/generated/resolverTypes.ts:
+    config:
+      useIndexSignature: true
+      defaultMapper: Partial<{T}>
+      makeResolverTypeCallable: true
+      wrapEntireFieldDefinitions: true
+    plugins:
+      - "typescript"
+      - "typescript-resolvers"
+    hooks:
+      afterOneFileWrite:
+      - eslint --fix
