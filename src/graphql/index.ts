@@ -52,7 +52,7 @@ const resolvers: Resolvers<{ dataSources: DataSources }> = {
     partiQL: async (parent, { id }, { dataSources }) => {
       console.log({ parent, id }, 'input-obj');
       return JSON.stringify(
-        await dataSources.dynamoDB.query(`SELECT * FROM serverless-event-table WHERE id='${id}'`)
+        await dataSources.dynamoDB.query(`SELECT * FROM "serverless-event-table" WHERE id='${id}'`)
       );
     },
     getItem: async (_, { id }, { dataSources }) =>
