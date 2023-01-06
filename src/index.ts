@@ -1,12 +1,33 @@
 import { app } from './app';
-import { server } from './graphql';
+import { graphqlServer } from './graphql';
+import { loadDynamoDBClient, loadHttpClient } from './datasource';
+import { json } from 'express';
+import { expressMiddleware } from '@apollo/server/express4';
+import { getCurrentInvoke } from '@vendia/serverless-express';
+import serverlessExpress from '@vendia/serverless-express';
+const dataSources = {
+  dynamoDB: loadDynamoDBClient(),
+  httpApi: loadHttpClient('https://www.google.com'),
+};
 
-export const handler = server.createHandler({
-  expressAppFromMiddleware(middlewares) {
-    app.use(middlewares);
-    return app;
-  },
-  expressGetMiddlewareOptions: {
-    path: '/graphql',
-  },
-});
+graphqlServer.startInBackgroundHandlingStartupErrorsByLoggingAndFailingAllRequests();
+app.use(
+  '/graphql',
+  json(),
+  expressMiddleware(graphqlServer, {
+    context: async ({ req: express }) => {
+      const {
+        event: { headers },
+      } = getCurrentInvoke();
+
+      return {
+        headers,
+        express,
+        dataSources,
+        startDateTime: new Date(),
+      };
+    },
+  })
+);
+
+export const handler = serverlessExpress({ app });

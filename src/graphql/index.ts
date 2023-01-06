@@ -1,8 +1,9 @@
-import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core';
-import { ApolloServer, gql } from 'apollo-server-lambda';
-import { DynamoDBClient, HttpClient, loadDynamoDBClient, loadHttpClient } from '../datasource';
-import newRelicPlugin from '@newrelic/apollo-server-plugin';
+import { DynamoDBClient, HttpClient } from '../datasource';
+import createNewRelicPlugin from '@newrelic/apollo-server-plugin';
 import { Resolvers } from '../generated/resolverTypes';
+import gql from 'graphql-tag';
+import { ApolloServerPluginLandingPageGraphQLPlayground } from '@apollo/server-plugin-landing-page-graphql-playground';
+import { ApolloServer, ApolloServerPlugin } from '@apollo/server';
 
 const typeDefs = gql`
   type Http {
@@ -30,11 +31,6 @@ type DataSources = {
   httpApi: HttpClient;
 };
 
-const dataSources = () => ({
-  dynamoDB: loadDynamoDBClient(),
-  httpApi: loadHttpClient('https://www.google.com'),
-});
-
 const resolvers: Resolvers<{ dataSources: DataSources }> = {
   Query: {
     hello: () => 'Hello world!',
@@ -60,10 +56,12 @@ const resolvers: Resolvers<{ dataSources: DataSources }> = {
   },
 };
 
-export const server = new ApolloServer({
+export const graphqlServer = new ApolloServer({
   typeDefs,
   resolvers,
-  dataSources: dataSources as any,
-  plugins: [ApolloServerPluginLandingPageGraphQLPlayground(), newRelicPlugin],
+  plugins: [
+    ApolloServerPluginLandingPageGraphQLPlayground(),
+    createNewRelicPlugin<ApolloServerPlugin>({}),
+  ],
   introspection: true,
 });
