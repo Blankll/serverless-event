@@ -2,8 +2,9 @@ import { DynamoDBClient, HttpClient } from '../datasource';
 import createNewRelicPlugin from '@newrelic/apollo-server-plugin';
 import { Resolvers } from '../generated/resolverTypes';
 import gql from 'graphql-tag';
-import { ApolloServerPluginLandingPageGraphQLPlayground } from '@apollo/server-plugin-landing-page-graphql-playground';
 import { ApolloServer, ApolloServerPlugin } from '@apollo/server';
+import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
+import { ApolloServerPluginUsageReporting } from '@apollo/server/plugin/usageReporting';
 
 const typeDefs = gql`
   type Http {
@@ -48,7 +49,9 @@ const resolvers: Resolvers<{ dataSources: DataSources }> = {
     partiQL: async (parent, { id }, { dataSources }) => {
       console.log({ parent, id }, 'input-obj');
       return JSON.stringify(
-        await dataSources.dynamoDB.query(`SELECT * FROM "serverless-event-table" WHERE id='${id}'`)
+        await dataSources.dynamoDB.query(`SELECT *
+                                          FROM "serverless-event-table"
+                                          WHERE id = '${id}'`)
       );
     },
     getItem: async (_, { id }, { dataSources }) =>
@@ -60,7 +63,11 @@ export const graphqlServer = new ApolloServer({
   typeDefs,
   resolvers,
   plugins: [
-    ApolloServerPluginLandingPageGraphQLPlayground(),
+    ApolloServerPluginLandingPageLocalDefault(),
+    ApolloServerPluginUsageReporting({
+      sendHeaders: { all: true },
+      sendVariableValues: { all: true },
+    }),
     createNewRelicPlugin<ApolloServerPlugin>({}),
   ],
   introspection: true,

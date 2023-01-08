@@ -10,6 +10,13 @@ Parameters:
   NRLicenseKey:
     Description: the newrelic account licence key
     Type: String
+  ApolloKey:
+    Description: the apollo studio account licence key
+    Type: String
+  ApolloRef:
+    Description: the apollo studio account ref
+    Type: String
+    Default: serverless-event@main
 Resources:
   LambdaRole:
     Type: AWS::IAM::Role
@@ -60,6 +67,8 @@ Resources:
           NEW_RELIC_LAMBDA_HANDLER: src/index.handler
           NEW_RELIC_ACCOUNT_ID: !Ref NRAccountId
           NEW_RELIC_LICENSE_KEY: !Ref NRLicenseKey
+          APOLLO_KEY: !Ref ApolloKey
+          APOLLO_GRAPH_REF: !Ref ApolloRef
       Layers:
         - !Sub arn:${AWS::Partition}:lambda:${AWS::Region}:451483290750:layer:NewRelicNodeJS16X:16
       Tags:

@@ -22,9 +22,15 @@ By runing command bellow to package a executable lambda .zip
 ## deploy
 The whole stack defined in `deploy/cloudformation.yml` you can build it by upload it to cloudformation or simply run command bellow to sart up:
 ```sql
-./scripts/deploy.sh aws-profile nr-account-id nr-license-key
+./scripts/deploy.sh aws-profile nr-account-id nr-license-key apollo-key apollo-graph-ref
 ```
-
+## Sample requests
+```bash
+curl --request POST \
+    --header 'content-type: application/json' \
+    --url 'https://main--serverless-event.apollographos.net/graphql' \
+    --data '{"query":"query ExampleQuery {\n  hello\n}"}'
+```
 ## Simulate Scenarios
 By default, the dynamodb permission `dynamodb:PartiQLSelect` is denied, hence Query `simulate.dynamo.partiQL` will failed.
 

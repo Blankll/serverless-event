@@ -5,13 +5,15 @@ cd "$(dirname "$0")/.." || exit
 PROFILE=$1
 NR_ACCOUNT_ID=$2
 NR_LICENSE_KEY=$3
+APOLLO_KEY=$4
+APOLLO_GRAPH_REF=$5
 APP_NAME="serverless-event"
 
 #  deploy stack
 aws --profile "${PROFILE}" \
     cloudformation deploy \
     --stack-name $APP_NAME \
-    --parameter-overrides AppName="${APP_NAME}" NRAccountId="${NR_ACCOUNT_ID}" NRLicenseKey="${NR_LICENSE_KEY}" \
+    --parameter-overrides AppName="${APP_NAME}" NRAccountId="${NR_ACCOUNT_ID}" NRLicenseKey="${NR_LICENSE_KEY}" ApolloKey="${APOLLO_KEY}" ApolloRef="${APOLLO_GRAPH_REF}" \
     --template-file ./deploy/cloudformation.yml \
     --capabilities CAPABILITY_IAM
 
