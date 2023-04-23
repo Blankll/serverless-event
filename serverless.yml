@@ -1,0 +1,33 @@
+service: serverless-event
+provider:
+  name: aws
+  runtime: nodejs16.x
+  region: ap-southeast-2
+  environment:
+    NODE_ENV: local
+
+plugins:
+  - serverless-plugin-typescript
+  - serverless-offline
+custom:
+  serverless-offline:
+    host: 0.0.0.0
+    httpPort: 4001
+    noTimeout: true
+
+functions:
+  graphql:
+    handler: src/index.handler
+    events:
+      - http:
+          path: graphql
+          method: post
+          cors: true
+      - http:
+          path: graphql
+          method: get
+          cors: true
+
+package:
+  patterns:
+    - 'src/*'

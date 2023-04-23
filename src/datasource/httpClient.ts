@@ -16,7 +16,11 @@ export const loadHttpClient = (host: string): HttpClient => ({
           stack: JSON.stringify(data),
         };
       }
-      return { status: res.status, message: data.message || res.statusText, body: data };
+      return {
+        status: res.status,
+        message: (data as { message?: string }).message || res.statusText,
+        body: JSON.stringify(data),
+      };
     } catch (err) {
       console.error(err, 'failed to send http request');
       throw err;

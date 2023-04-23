@@ -3,8 +3,8 @@ import { graphqlServer } from './graphql';
 import { loadDynamoDBClient, loadHttpClient } from './datasource';
 import { json } from 'express';
 import { expressMiddleware } from '@apollo/server/express4';
-import { getCurrentInvoke } from '@vendia/serverless-express';
-import serverlessExpress from '@vendia/serverless-express';
+import serverlessExpress, { getCurrentInvoke } from '@vendia/serverless-express';
+
 const dataSources = {
   dynamoDB: loadDynamoDBClient(),
   httpApi: loadHttpClient('https://www.google.com'),

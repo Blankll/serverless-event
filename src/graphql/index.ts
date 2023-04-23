@@ -64,11 +64,16 @@ export const graphqlServer = new ApolloServer({
   resolvers,
   plugins: [
     ApolloServerPluginLandingPageLocalDefault(),
-    ApolloServerPluginUsageReporting({
-      sendHeaders: { all: true },
-      sendVariableValues: { all: true },
-    }),
-    createNewRelicPlugin<ApolloServerPlugin>({}),
+    ...((appEnv) =>
+      appEnv === 'prod'
+        ? [
+            createNewRelicPlugin<ApolloServerPlugin>({}),
+            ApolloServerPluginUsageReporting({
+              sendHeaders: { all: true },
+              sendVariableValues: { all: true },
+            }),
+          ]
+        : [])(process.env.APP_ENV),
   ],
   introspection: true,
 });

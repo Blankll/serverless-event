@@ -6,3 +6,4 @@ artifacts
 .idea
 .DS_Store
 newrelic_agent.log
+.build
