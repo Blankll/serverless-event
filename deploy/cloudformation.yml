@@ -43,13 +43,13 @@ Resources:
                   - !Join ['/', [!GetAtt DynamoDB.Arn, 'index', '*'] ]
   DynamoDB:
     Type: AWS::DynamoDB::Table
-    Properties: 
+    Properties:
       TableName: !Join ['-', [!Ref AppName, 'table'] ]
       BillingMode: PAY_PER_REQUEST
-      AttributeDefinitions: 
+      AttributeDefinitions:
         - AttributeName: "id"
           AttributeType: "S"
-      KeySchema: 
+      KeySchema:
         - AttributeName: "id"
           KeyType: "HASH"
   LambdaFunction:
@@ -64,6 +64,7 @@ Resources:
         ZipFile: '../dist/'
       Environment:
         Variables:
+          APP_ENV: prod
           NEW_RELIC_LAMBDA_HANDLER: src/index.handler
           NEW_RELIC_ACCOUNT_ID: !Ref NRAccountId
           NEW_RELIC_LICENSE_KEY: !Ref NRLicenseKey

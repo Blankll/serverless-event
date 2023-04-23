@@ -20,6 +20,7 @@
     "@as-integrations/aws-lambda": "^2.0.1",
     "@aws-sdk/client-dynamodb": "^3.316.0",
     "@aws-sdk/lib-dynamodb": "^3.316.0",
+    "@graphql-tools/utils": "^9.2.1",
     "@newrelic/apollo-server-plugin": "^3.0.0",
     "@vendia/serverless-express": "^4.10.1",
     "graphql": "^16.6.0",

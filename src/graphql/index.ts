@@ -5,20 +5,26 @@ import gql from 'graphql-tag';
 import { ApolloServer, ApolloServerPlugin } from '@apollo/server';
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
 import { ApolloServerPluginUsageReporting } from '@apollo/server/plugin/usageReporting';
+import { hidden } from '../directives/hidden';
+import { makeExecutableSchema } from '@graphql-tools/schema';
 
 const typeDefs = gql`
+  directive @hidden(
+    environments: [String!]
+    toggleQueryKey: String
+  ) on SCALAR | OBJECT | FIELD_DEFINITION | ARGUMENT_DEFINITION | INTERFACE | UNION | ENUM | ENUM_VALUE | INPUT_OBJECT | INPUT_FIELD_DEFINITION
   type Http {
-    status: Int
+    status: Int @hidden(environments: ["local"])
     message: String
     body: String
   }
-  type Dynamo {
+  type Dynamo @hidden(environments: ["local"]) {
     partiQL(id: String!): String
     getItem(id: String!): String
   }
   type Simulate {
     http: Http
-    dynamo: Dynamo
+    dynamo: Dynamo @hidden(environments: ["local"])
   }
   type Query {
     hello: String
@@ -59,21 +65,30 @@ const resolvers: Resolvers<{ dataSources: DataSources }> = {
   },
 };
 
+const schema = hidden(
+  makeExecutableSchema({
+    typeDefs,
+    resolvers,
+    resolverValidationOptions: { requireResolversToMatchSchema: 'ignore' },
+  }),
+  process.env.APP_ENV || 'local'
+);
+const plugins = [
+  ApolloServerPluginLandingPageLocalDefault(),
+  ...((appEnv) =>
+    appEnv === 'prod'
+      ? [
+          createNewRelicPlugin<ApolloServerPlugin>({}),
+          ApolloServerPluginUsageReporting({
+            sendHeaders: { all: true },
+            sendVariableValues: { all: true },
+          }),
+        ]
+      : [])(process.env.APP_ENV),
+];
+
 export const graphqlServer = new ApolloServer({
-  typeDefs,
-  resolvers,
-  plugins: [
-    ApolloServerPluginLandingPageLocalDefault(),
-    ...((appEnv) =>
-      appEnv === 'prod'
-        ? [
-            createNewRelicPlugin<ApolloServerPlugin>({}),
-            ApolloServerPluginUsageReporting({
-              sendHeaders: { all: true },
-              sendVariableValues: { all: true },
-            }),
-          ]
-        : [])(process.env.APP_ENV),
-  ],
+  schema,
+  plugins,
   introspection: true,
 });

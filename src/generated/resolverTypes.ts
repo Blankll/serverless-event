@@ -160,6 +160,18 @@ export type ResolversParentTypes = ResolversObject<{
   String: Partial<Scalars['String']>;
 }>;
 
+export type HiddenDirectiveArgs = {
+  environments?: Maybe<Array<Scalars['String']>>;
+  toggleQueryKey?: Maybe<Scalars['String']>;
+};
+
+export type HiddenDirectiveResolver<
+  Result,
+  Parent,
+  ContextType = any,
+  Args = HiddenDirectiveArgs
+> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
+
 export type DynamoResolvers<
   ContextType = any,
   ParentType extends ResolversParentTypes['Dynamo'] = ResolversParentTypes['Dynamo']
@@ -217,4 +229,8 @@ export type Resolvers<ContextType = any> = ResolversObject<{
   Http?: HttpResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
   Simulate?: SimulateResolvers<ContextType>;
+}>;
+
+export type DirectiveResolvers<ContextType = any> = ResolversObject<{
+  hidden?: HiddenDirectiveResolver<any, any, ContextType>;
 }>;
